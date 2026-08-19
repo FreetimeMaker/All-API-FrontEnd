@@ -27,7 +27,14 @@ async function forward(req: NextRequest, pathArray: string[] | string) {
   }
 
   const path = Array.isArray(pathArray) ? pathArray.join("/") : String(pathArray);
-  const url = `${API_BASE}/${path}`;
+  // Build target URL and preserve incoming query string
+  const target = new URL(`${API_BASE}/${path}`);
+  try {
+    const incomingSearch = req.nextUrl?.search || new URL(req.url).search || "";
+    if (incomingSearch) target.search = incomingSearch;
+  } catch (e) {
+    // ignore
+  }
 
   const headers: Record<string, string> = {};
   req.headers.forEach((value, key) => {
@@ -41,28 +48,38 @@ async function forward(req: NextRequest, pathArray: string[] | string) {
     body: req.method !== "GET" && req.method !== "HEAD" ? await req.text() : undefined,
   };
 
-  const res = await fetch(url, init);
+  const res = await fetch(target.toString(), init);
   const contentType = res.headers.get("content-type") || "text/plain";
   const body = await res.arrayBuffer();
 
+  const responseHeaders: Record<string, string> = { "content-type": contentType };
+  const cacheControl = res.headers.get("cache-control");
+  if (cacheControl) responseHeaders["cache-control"] = cacheControl;
+
   return new Response(body, {
     status: res.status,
-    headers: { "content-type": contentType },
+    headers: responseHeaders,
   });
 }
 
-export async function GET(req: NextRequest, { params }: any) {
-  return forward(req, params.path || "");
+// Note: context.params can be a Promise in newer Next.js versions — await it before use
+export async function GET(req: NextRequest, context: any) {
+  const ctxParams = await (context?.params ?? {});
+  return forward(req, ctxParams.path || "");
 }
-export async function POST(req: NextRequest, { params }: any) {
-  return forward(req, params.path || "");
+export async function POST(req: NextRequest, context: any) {
+  const ctxParams = await (context?.params ?? {});
+  return forward(req, ctxParams.path || "");
 }
-export async function PUT(req: NextRequest, { params }: any) {
-  return forward(req, params.path || "");
+export async function PUT(req: NextRequest, context: any) {
+  const ctxParams = await (context?.params ?? {});
+  return forward(req, ctxParams.path || "");
 }
-export async function DELETE(req: NextRequest, { params }: any) {
-  return forward(req, params.path || "");
+export async function DELETE(req: NextRequest, context: any) {
+  const ctxParams = await (context?.params ?? {});
+  return forward(req, ctxParams.path || "");
 }
-export async function PATCH(req: NextRequest, { params }: any) {
-  return forward(req, params.path || "");
+export async function PATCH(req: NextRequest, context: any) {
+  const ctxParams = await (context?.params ?? {});
+  return forward(req, ctxParams.path || "");
 }

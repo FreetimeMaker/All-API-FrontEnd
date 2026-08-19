@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import AuthNav from "./components/AuthNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,11 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <header className="w-full bg-white/70 border-b py-3 px-6">
-          <nav className="max-w-4xl mx-auto flex gap-4">
-            <a href="/" className="font-medium">Home</a>
-            <a href="/login" className="font-medium">Login</a>
-            <a href="/logout" className="font-medium">Logout</a>
-          </nav>
+          <AuthNav />
         </header>
         <main className="flex-1">{children}</main>
       </body>

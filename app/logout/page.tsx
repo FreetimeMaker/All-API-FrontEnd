@@ -1,20 +1,61 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function LogoutPage() {
-  const [result, setResult] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    fetch("/api/session")
+      .then((r) => r.json())
+      .then((j) => {
+        if (!mounted) return;
+        setLoggedIn(Boolean(j?.loggedIn));
+        setUser(j?.user ?? null);
+      })
+      .catch(() => setLoggedIn(false))
+      .finally(() => mounted && setLoading(false));
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   async function handleLogout() {
-    const res = await fetch(`/api/proxy/api/v1/auth/logout`, { method: "POST" });
-    const data = await res.json().catch(() => ({ message: "No JSON" }));
-    setResult({ status: res.status, body: data });
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/proxy/api/v1/auth/logout`, { method: "POST" });
+      if (!res.ok) {
+        setMessage(`Logout failed: ${res.status}`);
+      } else {
+        setMessage("Erfolgreich abgemeldet.");
+        setLoggedIn(false);
+      }
+    } catch (e: any) {
+      setMessage(`Error: ${e?.message ?? e}`);
+    }
   }
+
+  if (loading) return <main className="p-8">Checking session…</main>;
 
   return (
     <main className="p-8">
       <h1 className="text-2xl font-bold">Logout</h1>
-      <button onClick={handleLogout} className="mt-4 px-4 py-2 bg-red-600 text-white rounded">Call Logout</button>
-      {result && <pre className="mt-4 bg-gray-100 p-4 rounded">{JSON.stringify(result, null, 2)}</pre>}
+      {loggedIn ? (
+        <div className="mt-4">
+          <p>Angemeldet als <strong>{user?.name ?? user?.username ?? "User"}</strong></p>
+          <button onClick={handleLogout} className="mt-4 px-4 py-2 bg-red-600 text-white rounded">Logout</button>
+        </div>
+      ) : (
+        <div className="mt-4">
+          <p className="text-gray-600">Du bist nicht angemeldet.</p>
+          <a href="/login" className="mt-2 inline-block px-3 py-1 bg-blue-600 text-white rounded">Zur Anmeldung</a>
+        </div>
+      )}
+
+      {message && <div className="mt-4 p-3 bg-gray-100 rounded">{message}</div>}
     </main>
   );
 }
