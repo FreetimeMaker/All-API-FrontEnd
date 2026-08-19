@@ -57,15 +57,30 @@ async function forward(req: NextRequest, pathArray: string[] | string) {
     method: req.method,
     headers,
     body: req.method !== "GET" && req.method !== "HEAD" ? await req.text() : undefined,
+    redirect: "manual",
   };
 
   const res = await fetch(target.toString(), init);
-  const contentType = res.headers.get("content-type") || "text/plain";
-  const body = await res.arrayBuffer();
+  const responseHeaders = new Headers();
 
-  const responseHeaders: Record<string, string> = { "content-type": contentType };
-  const cacheControl = res.headers.get("cache-control");
-  if (cacheControl) responseHeaders["cache-control"] = cacheControl;
+  // Forward all headers from the upstream response
+  res.headers.forEach((value, key) => {
+    if (key.toLowerCase() === "set-cookie") return; // Handle separately below
+    if (key.toLowerCase() === "content-encoding") return; // Let Next.js handle compression
+    responseHeaders.set(key, value);
+  });
+
+  // Correctly handle multiple Set-Cookie headers
+  const setCookies = (res.headers as any).getSetCookie?.() || res.headers.get("set-cookie");
+  if (setCookies) {
+    if (Array.isArray(setCookies)) {
+      setCookies.forEach((c) => responseHeaders.append("Set-Cookie", c));
+    } else {
+      responseHeaders.set("Set-Cookie", setCookies);
+    }
+  }
+
+  const body = await res.arrayBuffer();
 
   return new Response(body, {
     status: res.status,
