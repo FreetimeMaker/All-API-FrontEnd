@@ -42,6 +42,17 @@ async function forward(req: NextRequest, pathArray: string[] | string) {
     headers[key] = value as string;
   });
 
+  // For OAuth login routes, redirect the browser to the upstream domain so the provider
+  // pages and cookies are served from the API's domain. Health check already ran above.
+  try {
+    const lowerPath = path.toLowerCase();
+    if (req.method === "GET" && lowerPath.includes("/auth/login")) {
+      return Response.redirect(target.toString(), 307);
+    }
+  } catch (e) {
+    // ignore and continue to proxy fetch
+  }
+
   const init: RequestInit = {
     method: req.method,
     headers,
