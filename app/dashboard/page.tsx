@@ -43,10 +43,21 @@ export default function DashboardPage() {
 
   async function handleLogout() {
     try {
+      // Clear mock session
+      localStorage.removeItem('mock_session');
+      localStorage.removeItem('mock_user');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('auth_code');
+      
       await fetch("/api/proxy/api/v1/auth/logout", { method: "POST" });
       router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
+      // Clear local storage on error as well
+      localStorage.removeItem('mock_session');
+      localStorage.removeItem('mock_user');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('auth_code');
       router.push("/login");
     }
   }

@@ -69,10 +69,22 @@ export default function AuthNav() {
 
   async function handleLogout() {
     try {
+      // Clear mock session
+      localStorage.removeItem('mock_session');
+      localStorage.removeItem('mock_user');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('auth_code');
+      
+      // Try to logout from API
       const res = await fetch("/api/proxy/api/v1/auth/logout", { method: "POST" });
       // best-effort: ignore failures but refresh session
       await fetchSession();
     } catch (_) {
+      // Clear local storage on error as well
+      localStorage.removeItem('mock_session');
+      localStorage.removeItem('mock_user');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('auth_code');
       await fetchSession();
     }
   }
