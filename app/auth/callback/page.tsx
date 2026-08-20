@@ -22,6 +22,7 @@ function AuthCallbackContent() {
     // Since the API handles OAuth completely without returning tokens to us,
     // we'll set a mock session for development purposes
     // In production, this would need proper API integration
+    console.log("Setting mock session in localStorage");
     localStorage.setItem('mock_session', 'true');
     localStorage.setItem('mock_user', JSON.stringify({
       name: "Test User",
@@ -29,8 +30,13 @@ function AuthCallbackContent() {
       email: "test@example.com"
     }));
 
+    // Verify the values were set
+    console.log("Mock session set:", localStorage.getItem('mock_session'));
+    console.log("Mock user set:", localStorage.getItem('mock_user'));
+
     // Redirect to dashboard after a short delay
     setTimeout(() => {
+      console.log("Redirecting to dashboard");
       router.push("/dashboard");
     }, 1000);
   }, [router, searchParams]);

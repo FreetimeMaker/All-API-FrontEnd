@@ -8,10 +8,15 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log("Dashboard: Checking session...");
+    
     // Check for mock session first (for development)
     const mockSession = localStorage.getItem('mock_session');
+    console.log("Dashboard: Mock session present:", mockSession);
+    
     if (mockSession === 'true') {
       const mockUser = JSON.parse(localStorage.getItem('mock_user') || '{}');
+      console.log("Dashboard: Using mock user:", mockUser);
       setUser(mockUser);
       setLoading(false);
       return;
@@ -19,6 +24,8 @@ export default function DashboardPage() {
 
     const accessToken = localStorage.getItem('access_token');
     const authCode = localStorage.getItem('auth_code');
+    console.log("Dashboard: Access token present:", !!accessToken, "Auth code present:", !!authCode);
+    
     const headers: HeadersInit = {};
     
     if (accessToken) {
@@ -32,11 +39,18 @@ export default function DashboardPage() {
     })
       .then(res => res.json())
       .then(data => {
+        console.log("Dashboard: Session check result:", data);
         if (!data.loggedIn) {
+          console.log("Dashboard: Not logged in, redirecting to login");
           router.push("/login");
         } else {
+          console.log("Dashboard: Logged in, setting user:", data.user);
           setUser(data.user);
         }
+      })
+      .catch(error => {
+        console.error("Dashboard: Session check error:", error);
+        router.push("/login");
       })
       .finally(() => setLoading(false));
   }, [router]);
