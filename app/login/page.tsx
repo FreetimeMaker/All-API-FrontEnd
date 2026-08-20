@@ -41,7 +41,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <p className="mt-4 text-sm text-slate-500">Hinweis: Vor jedem API-Aufruf prüft der Server die Health-API; wenn die API nicht verfügbar ist, wird die Anfrage abgelehnt.</p>
+        <p className="mt-4 text-sm text-slate-600">Hinweis: Vor jedem API-Aufruf prüft der Server die Health-API; wenn die API nicht verfügbar ist, wird die Anfrage abgelehnt.</p>
       </div>
     </main>
   );

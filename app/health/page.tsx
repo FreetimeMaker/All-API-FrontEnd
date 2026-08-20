@@ -19,7 +19,7 @@ export default function HealthPage() {
   }, []);
 
   if (loading) {
-    return <div className="p-8 text-slate-600">Loading...</div>;
+    return <div className="p-8 text-slate-700">Loading...</div>;
   }
 
   return (

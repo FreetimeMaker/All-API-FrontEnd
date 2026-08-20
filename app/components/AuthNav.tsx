@@ -59,7 +59,7 @@ export default function AuthNav() {
     <nav className="max-w-4xl mx-auto flex items-center justify-between py-2">
       <div className="flex items-center gap-4">
         <a href="/" className="font-semibold text-lg text-slate-800">All API Frontend</a>
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-medium uppercase tracking-wider text-slate-500">
+        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-medium uppercase tracking-wider text-slate-600">
           <div className={`h-2 w-2 rounded-full ${healthStatus === 'ok' ? 'bg-emerald-500' : healthStatus === 'error' ? 'bg-red-500' : 'bg-amber-400 animate-pulse'}`} />
           API {healthStatus === 'ok' ? 'Online' : healthStatus === 'error' ? 'Offline' : 'Checking'}
         </div>
@@ -69,7 +69,7 @@ export default function AuthNav() {
         {loading ? (
           <div className="flex items-center gap-2">
             <Spinner />
-            <span className="text-sm text-slate-500">Checking login…</span>
+            <span className="text-sm text-slate-600">Checking login…</span>
           </div>
         ) : error ? (
           <span className="text-sm text-red-600">Error checking session</span>
@@ -108,7 +108,7 @@ export default function AuthNav() {
                 );
               })()}
 
-              <span className="text-sm text-slate-700">{user?.name ?? user?.username ?? "User"}</span>
+              <span className="text-sm text-slate-800">{user?.name ?? user?.username ?? "User"}</span>
               <button onClick={handleLogout} className="px-3 py-1 rounded bg-red-600 text-white text-sm hover:bg-red-700 transition-colors">Logout</button>
             </div>
           </div>

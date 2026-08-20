@@ -31,7 +31,7 @@ export default function DashboardPage() {
   }
 
   if (loading) {
-    return <div className="p-8 text-slate-600">Loading...</div>;
+    return <div className="p-8 text-slate-700">Loading...</div>;
   }
 
   if (!user) {
@@ -49,7 +49,7 @@ export default function DashboardPage() {
     <div className="space-y-6 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen p-6">
       <header className="max-w-6xl mx-auto">
         <h1 className="text-2xl font-bold text-slate-900">Konto-Übersicht</h1>
-        <p className="text-slate-600">Willkommen, {user?.name || user?.username || "Benutzer"}. Verwalte hier deine persönlichen Kontodetails und Einstellungen.</p>
+        <p className="text-slate-700">Willkommen, {user?.name || user?.username || "Benutzer"}. Verwalte hier deine persönlichen Kontodetails und Einstellungen.</p>
       </header>
 
       {/* Account Stats Grid */}
@@ -63,7 +63,7 @@ export default function DashboardPage() {
               </span>
             </div>
             <div className="mt-4">
-              <p className="text-sm font-medium text-slate-500">{stat.title}</p>
+              <p className="text-sm font-medium text-slate-600">{stat.title}</p>
               <p className="text-xl font-bold text-slate-900">{stat.value}</p>
             </div>
           </div>
@@ -85,9 +85,9 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-slate-900 font-medium">Erfolgreicher Login</p>
-                  <p className="text-slate-500 text-xs">Chrome auf macOS • Berlin, DE</p>
+                  <p className="text-slate-600 text-xs">Chrome auf macOS • Berlin, DE</p>
                 </div>
-                <span className="text-xs text-slate-400">Vor 2 Stunden</span>
+                <span className="text-xs text-slate-500">Vor 2 Stunden</span>
               </li>
               <li className="flex items-center gap-4 text-sm">
                 <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold">
@@ -95,9 +95,9 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-slate-900 font-medium">Profilbild aktualisiert</p>
-                  <p className="text-slate-500 text-xs">Synchronisiert von GitHub</p>
+                  <p className="text-slate-600 text-xs">Synchronisiert von GitHub</p>
                 </div>
-                <span className="text-xs text-slate-400">Gestern, 18:45</span>
+                <span className="text-xs text-slate-500">Gestern, 18:45</span>
               </li>
               <li className="flex items-center gap-4 text-sm">
                 <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 text-xs font-bold">
@@ -105,9 +105,9 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-slate-900 font-medium">Sicherheits-Check durchgeführt</p>
-                  <p className="text-slate-500 text-xs">Keine verdächtigen Aktivitäten gefunden</p>
+                  <p className="text-slate-600 text-xs">Keine verdächtigen Aktivitäten gefunden</p>
                 </div>
-                <span className="text-xs text-slate-400">14. Aug 2026</span>
+                <span className="text-xs text-slate-500">14. Aug 2026</span>
               </li>
             </ul>
           </div>
