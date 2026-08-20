@@ -23,18 +23,38 @@ function AuthCallbackContent() {
     const accessToken = searchParams.get("access_token");
     const tokenType = searchParams.get("token_type") || "Bearer";
     const expiresIn = searchParams.get("expires_in");
+    const userParam = searchParams.get("user");
     
     if (accessToken) {
       console.log("Access token received, storing in localStorage");
       localStorage.setItem('access_token', accessToken);
       localStorage.setItem('token_type', tokenType);
+      localStorage.setItem('auth_token', accessToken); // Store with consistent key
       
       if (expiresIn) {
         const expiresAt = Date.now() + (parseInt(expiresIn) * 1000);
         localStorage.setItem('token_expires_at', expiresAt.toString());
       }
       
-      // Fetch user info using the access token
+      // If user data is already provided, store it directly
+      if (userParam) {
+        try {
+          const userData = JSON.parse(decodeURIComponent(userParam));
+          console.log("User data received in callback:", userData);
+          localStorage.setItem('user_info', JSON.stringify(userData));
+          
+          // Redirect to dashboard immediately
+          setTimeout(() => {
+            console.log("Redirecting to dashboard with user data");
+            router.push("/dashboard");
+          }, 500);
+          return;
+        } catch (e) {
+          console.error("Error parsing user data:", e);
+        }
+      }
+      
+      // Otherwise fetch user info using the access token
       fetchUserInfo(accessToken, router);
     } else {
       // Fallback to mock session if no token is provided

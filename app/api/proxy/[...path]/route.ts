@@ -37,6 +37,93 @@ async function forward(req: NextRequest, pathArray: string[] | string) {
       return NextResponse.redirect(target.toString(), 307);
     }
 
+    // Special handling for OAuth callback - intercept to extract tokens
+    if (req.method === "GET" && path.toLowerCase().includes("/auth/callback")) {
+      console.log("Proxying OAuth callback, intercepting for token extraction");
+      
+      // Forward the request to the API
+      const res = await fetch(target.toString(), {
+        method: req.method,
+        headers,
+        redirect: "follow", // Follow redirects to get the final response
+      });
+
+      // Try to extract tokens from the response
+      const contentType = res.headers.get("content-type") || "";
+      let tokens: any = {};
+
+      if (contentType.includes("application/json")) {
+        try {
+          const jsonData = await res.json();
+          console.log("OAuth callback JSON response:", jsonData);
+          
+          // Extract tokens from JSON response
+          if (jsonData.access_token) tokens.access_token = jsonData.access_token;
+          if (jsonData.token_type) tokens.token_type = jsonData.token_type;
+          if (jsonData.expires_in) tokens.expires_in = jsonData.expires_in;
+          if (jsonData.refresh_token) tokens.refresh_token = jsonData.refresh_token;
+        } catch (e) {
+          console.error("Error parsing OAuth JSON response:", e);
+        }
+      } else {
+        // Check if tokens are in URL fragment or query params
+        const url = new URL(req.url);
+        const searchParams = url.searchParams;
+        
+        if (searchParams.get("access_token")) tokens.access_token = searchParams.get("access_token");
+        if (searchParams.get("token_type")) tokens.token_type = searchParams.get("token_type");
+        if (searchParams.get("expires_in")) tokens.expires_in = searchParams.get("expires_in");
+        
+        console.log("OAuth callback URL params:", Object.fromEntries(searchParams.entries()));
+      }
+
+      // If we found tokens, redirect to frontend callback with tokens
+      if (tokens.access_token) {
+        console.log("Tokens extracted, redirecting to frontend callback with tokens");
+        const frontendCallback = new URL("/auth/callback", req.url);
+        Object.keys(tokens).forEach(key => {
+          if (tokens[key]) frontendCallback.searchParams.set(key, tokens[key]);
+        });
+        return NextResponse.redirect(frontendCallback.toString(), 302);
+      }
+
+      // Otherwise, just follow the original redirect behavior
+      console.log("No tokens found, following original redirect");
+      const responseHeaders = new Headers();
+      res.headers.forEach((value, key) => {
+        const lowerKey = key.toLowerCase();
+        if (HOP_BY_HOP_HEADERS.includes(lowerKey)) return;
+        if (lowerKey === "set-cookie") return;
+        if (lowerKey === "content-encoding") return;
+        if (lowerKey === "content-length") return;
+        responseHeaders.set(key, value);
+      });
+
+      // Handle Set-Cookie headers
+      const setCookies = (res.headers as any).getSetCookie?.() || res.headers.get("set-cookie");
+      if (setCookies) {
+        const cookiesArray = Array.isArray(setCookies) ? setCookies : [setCookies];
+        cookiesArray.forEach(c => responseHeaders.append("Set-Cookie", c));
+      }
+
+      // If upstream returned a redirect, pass it through
+      if (res.status >= 300 && res.status < 400) {
+        const location = res.headers.get("location");
+        if (location) {
+          return new Response(null, {
+            status: res.status,
+            headers: responseHeaders,
+          });
+        }
+      }
+
+      const resBody = await res.arrayBuffer();
+      return new Response(resBody, {
+        status: res.status,
+        headers: responseHeaders,
+      });
+    }
+
     // Prepare request body
     let body: any = undefined;
     if (req.method !== "GET" && req.method !== "HEAD") {

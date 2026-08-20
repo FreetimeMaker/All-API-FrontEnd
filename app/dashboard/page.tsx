@@ -22,6 +22,20 @@ export default function DashboardPage() {
       return;
     }
 
+    // Check for user_info from OAuth callback
+    const userInfo = localStorage.getItem('user_info');
+    if (userInfo) {
+      try {
+        const userData = JSON.parse(userInfo);
+        console.log("Dashboard: Using user info from OAuth callback:", userData);
+        setUser(userData);
+        setLoading(false);
+        return;
+      } catch (e) {
+        console.error("Dashboard: Error parsing user_info:", e);
+      }
+    }
+
     const accessToken = localStorage.getItem('access_token');
     const authCode = localStorage.getItem('auth_code');
     const userToken = localStorage.getItem('auth_token'); // New key from callback
@@ -60,12 +74,23 @@ export default function DashboardPage() {
   useEffect(() => {
     const checkLocalStorage = () => {
       const mockSession = localStorage.getItem('mock_session');
-      console.log("Dashboard: Periodic check - Mock session:", mockSession);
+      const userInfo = localStorage.getItem('user_info');
+      console.log("Dashboard: Periodic check - Mock session:", mockSession, "User info:", !!userInfo);
+      
       if (mockSession === 'true' && !user) {
         const mockUser = JSON.parse(localStorage.getItem('mock_user') || '{}');
         console.log("Dashboard: Found mock session in periodic check, setting user");
         setUser(mockUser);
         setLoading(false);
+      } else if (userInfo && !user) {
+        try {
+          const userData = JSON.parse(userInfo);
+          console.log("Dashboard: Found user info in periodic check, setting user");
+          setUser(userData);
+          setLoading(false);
+        } catch (e) {
+          console.error("Dashboard: Error parsing user_info in periodic check:", e);
+        }
       }
     };
 

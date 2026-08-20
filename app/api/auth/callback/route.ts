@@ -1,22 +1,79 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const API_BASE = process.env.API_BASE || "https://all-api-node.vercel.app";
+
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const next = searchParams.get("next") || "/dashboard";
+  const url = new URL(req.url);
+  const searchParams = url.searchParams;
+  
+  console.log("Custom OAuth callback handler received params:", Object.fromEntries(searchParams.entries()));
+  
+  // Check if this is the callback from the OAuth provider (has code or error)
+  const code = searchParams.get("code");
   const error = searchParams.get("error");
+  const provider = searchParams.get("provider");
   
-  // Log callback parameters for debugging
-  console.log("API auth callback received:", Object.fromEntries(searchParams.entries()));
-  
-  // Check for error parameters
   if (error) {
     console.error("OAuth error:", error);
-    return NextResponse.redirect(new URL("/login?error=" + encodeURIComponent(error), req.url));
+    return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(error)}`, req.url));
   }
-
-  // Redirect to the frontend callback page which will handle the session check
-  const callbackUrl = new URL("/auth/callback", req.url);
-  callbackUrl.searchParams.set("next", next);
   
-  return NextResponse.redirect(callbackUrl);
+  if (code && provider) {
+    // Exchange the authorization code for tokens
+    console.log("Exchanging authorization code for tokens");
+    
+    try {
+      const tokenResponse = await fetch(`${API_BASE}/api/v1/auth/callback?code=${encodeURIComponent(code)}&provider=${provider}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      console.log("Token exchange response status:", tokenResponse.status);
+      
+      if (tokenResponse.ok) {
+        const contentType = tokenResponse.headers.get("content-type") || "";
+        let tokens: any = {};
+        
+        if (contentType.includes("application/json")) {
+          try {
+            const jsonData = await tokenResponse.json();
+            console.log("Token response JSON:", jsonData);
+            
+            // Extract tokens from response
+            if (jsonData.access_token) tokens.access_token = jsonData.access_token;
+            if (jsonData.token_type) tokens.token_type = jsonData.token_type;
+            if (jsonData.expires_in) tokens.expires_in = jsonData.expires_in;
+            if (jsonData.refresh_token) tokens.refresh_token = jsonData.refresh_token;
+            if (jsonData.user) tokens.user = jsonData.user;
+          } catch (e) {
+            console.error("Error parsing token JSON:", e);
+          }
+        }
+        
+        // Redirect to frontend callback with tokens
+        if (tokens.access_token) {
+          console.log("Tokens extracted, redirecting to frontend callback");
+          const frontendCallback = new URL("/auth/callback", req.url);
+          Object.keys(tokens).forEach(key => {
+            if (tokens[key]) {
+              if (key === "user") {
+                frontendCallback.searchParams.set(key, JSON.stringify(tokens[key]));
+              } else {
+                frontendCallback.searchParams.set(key, tokens[key]);
+              }
+            }
+          });
+          return NextResponse.redirect(frontendCallback.toString(), 302);
+        }
+      }
+    } catch (e) {
+      console.error("Error exchanging code for tokens:", e);
+    }
+  }
+  
+  // Fallback: redirect to frontend callback without tokens (will use mock session)
+  console.log("No tokens found, redirecting to frontend callback for mock session");
+  return NextResponse.redirect(new URL("/auth/callback", req.url), 302);
 }

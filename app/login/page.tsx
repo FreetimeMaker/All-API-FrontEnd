@@ -18,9 +18,9 @@ function ProviderIcon({ provider }: { provider: "github" | "gitlab" }) {
 
 export default function LoginPage() {
   function redirectTo(provider: "github" | "gitlab") {
-    // Use our proxy to handle the OAuth flow properly
-    // This ensures cookies and redirects work correctly
-    window.location.href = `/api/proxy/api/v1/auth/login?provider=${provider}&next=${encodeURIComponent(window.location.origin + '/auth/callback')}`;
+    // Redirect to the API's OAuth login, but specify our custom callback handler
+    // Our custom handler will intercept the response and extract tokens
+    window.location.href = `/api/proxy/api/v1/auth/login?provider=${provider}&next=${encodeURIComponent(window.location.origin + '/api/auth/callback')}`;
   }
 
   return (

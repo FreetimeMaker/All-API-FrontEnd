@@ -32,6 +32,20 @@ export default function AuthNav() {
         return;
       }
 
+      // Check for user_info from OAuth callback
+      const userInfo = localStorage.getItem('user_info');
+      if (userInfo) {
+        try {
+          const userData = JSON.parse(userInfo);
+          setLoggedIn(true);
+          setUser(userData);
+          setLoading(false);
+          return;
+        } catch (e) {
+          console.error("Error parsing user_info:", e);
+        }
+      }
+
       const accessToken = localStorage.getItem('access_token');
       const authCode = localStorage.getItem('auth_code');
       const userToken = localStorage.getItem('auth_token'); // New key from callback
