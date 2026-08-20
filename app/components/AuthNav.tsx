@@ -74,7 +74,9 @@ export default function AuthNav() {
         ) : error ? (
           <span className="text-sm text-red-600">Error checking session</span>
         ) : loggedIn ? (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+            <a href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">Dashboard</a>
+            <div className="flex items-center gap-3">
             {(() => {
               const avatarUrl =
                 user?.avatar ||
