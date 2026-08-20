@@ -10,7 +10,7 @@ function AuthCallbackContent() {
     // Check for error parameters from URL
     const error = searchParams.get("error");
     const access_token = searchParams.get("access_token");
-    const next = searchParams.get("next") || "/dashboard";
+    const code = searchParams.get("code");
     
     if (error) {
       console.error("OAuth error:", error);
@@ -21,15 +21,20 @@ function AuthCallbackContent() {
     // Log callback parameters for debugging
     console.log("Auth callback received params:", Object.fromEntries(searchParams.entries()));
 
-    // If we have an access_token, store it in localStorage
+    // If we have an access_token or code, store it
     if (access_token) {
       console.log("Storing access token");
       localStorage.setItem('access_token', access_token);
     }
+    
+    if (code) {
+      console.log("Storing auth code");
+      localStorage.setItem('auth_code', code);
+    }
 
-    // Wait a moment for any cookies to be set, then redirect to the next page
+    // Wait a moment for any cookies to be set, then redirect to dashboard
     setTimeout(() => {
-      router.push(next);
+      router.push("/dashboard");
     }, 1000);
   }, [router, searchParams]);
 

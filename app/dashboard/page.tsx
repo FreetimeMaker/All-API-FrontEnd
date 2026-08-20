@@ -9,9 +9,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token');
+    const authCode = localStorage.getItem('auth_code');
     const headers: HeadersInit = {};
+    
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`;
+    } else if (authCode) {
+      headers['Authorization'] = `Bearer ${authCode}`;
     }
     
     fetch("/api/session", {

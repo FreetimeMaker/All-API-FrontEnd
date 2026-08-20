@@ -10,12 +10,14 @@ function looksLikeUser(obj: any) {
 }
 
 export async function GET(req: NextRequest) {
-  const cookie = req.headers.get("cookie") || "";
+  // Since we can't share cookies across domains, we'll use client-side storage approach
+  // For now, we'll assume no session unless the client sends auth headers
+  
   const authHeader = req.headers.get("authorization") || "";
-  console.log("Session check - cookies present:", !!cookie, "auth header present:", !!authHeader);
+  console.log("Session check - auth header present:", !!authHeader);
   
   try {
-    const headers: HeadersInit = { cookie };
+    const headers: HeadersInit = {};
     if (authHeader) {
       headers["authorization"] = authHeader;
     }
@@ -23,12 +25,13 @@ export async function GET(req: NextRequest) {
     const res = await fetch(`${API_BASE}/api/v1/auth/me`, {
       method: "GET",
       headers,
-      credentials: "include",
     });
     
     console.log("Session check - API response status:", res.status);
 
     if (!res.ok) {
+      // If cookies didn't work, try with access token from localStorage approach
+      // We'll accept this as not logged in for now
       return new Response(JSON.stringify({ loggedIn: false }), {
         status: 200,
         headers: { "content-type": "application/json" },
