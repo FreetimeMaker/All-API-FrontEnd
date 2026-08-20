@@ -58,9 +58,9 @@ export default function AuthNav() {
   return (
     <nav className="max-w-4xl mx-auto flex items-center justify-between py-2">
       <div className="flex items-center gap-4">
-        <a href="/" className="font-semibold text-lg">All API Frontend</a>
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gray-50 border text-[10px] font-medium uppercase tracking-wider text-gray-500">
-          <div className={`h-2 w-2 rounded-full ${healthStatus === 'ok' ? 'bg-green-500' : healthStatus === 'error' ? 'bg-red-500' : 'bg-yellow-400 animate-pulse'}`} />
+        <a href="/" className="font-semibold text-lg text-slate-800">All API Frontend</a>
+        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-medium uppercase tracking-wider text-slate-500">
+          <div className={`h-2 w-2 rounded-full ${healthStatus === 'ok' ? 'bg-emerald-500' : healthStatus === 'error' ? 'bg-red-500' : 'bg-amber-400 animate-pulse'}`} />
           API {healthStatus === 'ok' ? 'Online' : healthStatus === 'error' ? 'Offline' : 'Checking'}
         </div>
       </div>
@@ -69,13 +69,13 @@ export default function AuthNav() {
         {loading ? (
           <div className="flex items-center gap-2">
             <Spinner />
-            <span className="text-sm text-gray-500">Checking login…</span>
+            <span className="text-sm text-slate-500">Checking login…</span>
           </div>
         ) : error ? (
           <span className="text-sm text-red-600">Error checking session</span>
         ) : loggedIn ? (
           <div className="flex items-center gap-4">
-            <a href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">Dashboard</a>
+            <a href="/dashboard" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Dashboard</a>
             <div className="flex items-center gap-3">
               {(() => {
                 const avatarUrl =
@@ -102,18 +102,18 @@ export default function AuthNav() {
                   .toUpperCase();
 
                 return (
-                  <div aria-hidden className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-700">
+                  <div aria-hidden className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-medium text-slate-700">
                     {initials}
                   </div>
                 );
               })()}
 
-              <span className="text-sm">{user?.name ?? user?.username ?? "User"}</span>
-              <button onClick={handleLogout} className="px-3 py-1 rounded bg-red-600 text-white text-sm">Logout</button>
+              <span className="text-sm text-slate-700">{user?.name ?? user?.username ?? "User"}</span>
+              <button onClick={handleLogout} className="px-3 py-1 rounded bg-red-600 text-white text-sm hover:bg-red-700 transition-colors">Logout</button>
             </div>
           </div>
         ) : (
-          <a href="/login" className="px-3 py-1 rounded bg-blue-600 text-white text-sm">Login</a>
+          <a href="/login" className="px-3 py-1 rounded bg-indigo-600 text-white text-sm hover:bg-indigo-700 transition-colors">Login</a>
         )}
       </div>
     </nav>

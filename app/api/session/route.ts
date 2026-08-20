@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-const API_BASE = process.env.API_BASE || "https://all-api.vercel.app";
+const API_BASE = process.env.API_BASE || "https://all-api-node.vercel.app";
 
 function looksLikeUser(obj: any) {
   if (!obj || typeof obj !== "object") return false;
