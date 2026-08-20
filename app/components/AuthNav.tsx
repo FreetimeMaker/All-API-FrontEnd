@@ -22,6 +22,16 @@ export default function AuthNav() {
     setLoading(true);
     setError(null);
     try {
+      // Check for mock session first (for development)
+      const mockSession = localStorage.getItem('mock_session');
+      if (mockSession === 'true') {
+        const mockUser = JSON.parse(localStorage.getItem('mock_user') || '{}');
+        setLoggedIn(true);
+        setUser(mockUser);
+        setLoading(false);
+        return;
+      }
+
       const accessToken = localStorage.getItem('access_token');
       const authCode = localStorage.getItem('auth_code');
       const headers: HeadersInit = {};

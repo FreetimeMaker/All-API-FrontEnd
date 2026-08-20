@@ -10,9 +10,6 @@ function looksLikeUser(obj: any) {
 }
 
 export async function GET(req: NextRequest) {
-  // Since we can't share cookies across domains, we'll use client-side storage approach
-  // For now, we'll assume no session unless the client sends auth headers
-  
   const authHeader = req.headers.get("authorization") || "";
   console.log("Session check - auth header present:", !!authHeader);
   
