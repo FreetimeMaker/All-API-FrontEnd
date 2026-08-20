@@ -9,6 +9,7 @@ function AuthCallbackContent() {
   useEffect(() => {
     // Check for error parameters from URL
     const error = searchParams.get("error");
+    const access_token = searchParams.get("access_token");
     const next = searchParams.get("next") || "/dashboard";
     
     if (error) {
@@ -20,7 +21,13 @@ function AuthCallbackContent() {
     // Log callback parameters for debugging
     console.log("Auth callback received params:", Object.fromEntries(searchParams.entries()));
 
-    // Wait a moment for cookies to be set, then redirect to the next page
+    // If we have an access_token, store it in localStorage
+    if (access_token) {
+      console.log("Storing access token");
+      localStorage.setItem('access_token', access_token);
+    }
+
+    // Wait a moment for any cookies to be set, then redirect to the next page
     setTimeout(() => {
       router.push(next);
     }, 1000);

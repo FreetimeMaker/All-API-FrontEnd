@@ -11,12 +11,18 @@ function looksLikeUser(obj: any) {
 
 export async function GET(req: NextRequest) {
   const cookie = req.headers.get("cookie") || "";
-  console.log("Session check - cookies present:", !!cookie);
+  const authHeader = req.headers.get("authorization") || "";
+  console.log("Session check - cookies present:", !!cookie, "auth header present:", !!authHeader);
   
   try {
+    const headers: HeadersInit = { cookie };
+    if (authHeader) {
+      headers["authorization"] = authHeader;
+    }
+    
     const res = await fetch(`${API_BASE}/api/v1/auth/me`, {
       method: "GET",
-      headers: { cookie },
+      headers,
       credentials: "include",
     });
     

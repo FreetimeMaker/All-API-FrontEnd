@@ -8,7 +8,15 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch("/api/session")
+    const accessToken = localStorage.getItem('access_token');
+    const headers: HeadersInit = {};
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+    
+    fetch("/api/session", {
+      headers
+    })
       .then(res => res.json())
       .then(data => {
         if (!data.loggedIn) {

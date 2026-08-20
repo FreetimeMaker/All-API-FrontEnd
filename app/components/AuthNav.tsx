@@ -22,7 +22,15 @@ export default function AuthNav() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/session");
+      const accessToken = localStorage.getItem('access_token');
+      const headers: HeadersInit = {};
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+      
+      const res = await fetch("/api/session", {
+        headers
+      });
       if (!res.ok) throw new Error(`status ${res.status}`);
       const j = await res.json();
       setLoggedIn(Boolean(j?.loggedIn));

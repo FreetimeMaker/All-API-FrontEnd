@@ -11,8 +11,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Provider required" }, { status: 400 });
   }
 
-  // Redirect to the API's login endpoint
-  const apiUrl = `${API_BASE}/api/v1/auth/login?provider=${provider}&next=${encodeURIComponent(req.nextUrl.origin + '/api/auth/callback?next=' + encodeURIComponent(next))}`;
+  // Redirect directly to the API's login endpoint with our callback URL
+  const callbackUrl = req.nextUrl.origin + '/auth/callback';
+  const apiUrl = `${API_BASE}/api/v1/auth/login?provider=${provider}&next=${encodeURIComponent(callbackUrl)}`;
   
+  console.log("Redirecting to API login:", apiUrl);
   return NextResponse.redirect(apiUrl);
 }
