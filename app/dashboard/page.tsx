@@ -55,6 +55,27 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, [router]);
 
+  // Also check on mount if localStorage might have been set earlier
+  useEffect(() => {
+    const checkLocalStorage = () => {
+      const mockSession = localStorage.getItem('mock_session');
+      console.log("Dashboard: Periodic check - Mock session:", mockSession);
+      if (mockSession === 'true' && !user) {
+        const mockUser = JSON.parse(localStorage.getItem('mock_user') || '{}');
+        console.log("Dashboard: Found mock session in periodic check, setting user");
+        setUser(mockUser);
+        setLoading(false);
+      }
+    };
+
+    // Check immediately
+    checkLocalStorage();
+    
+    // Check again after a short delay to handle any timing issues
+    const timeout = setTimeout(checkLocalStorage, 100);
+    return () => clearTimeout(timeout);
+  }, [user]);
+
   async function handleLogout() {
     try {
       // Clear mock session
