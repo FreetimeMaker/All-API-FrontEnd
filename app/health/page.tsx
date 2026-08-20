@@ -19,13 +19,13 @@ export default function HealthPage() {
   }, []);
 
   if (loading) {
-    return <div className="p-8 text-slate-700">Loading...</div>;
+    return <div className="p-8 text-slate-300 bg-slate-950 min-h-screen">Loading...</div>;
   }
 
   return (
-    <main className="p-8 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
-      <h1 className="text-2xl font-bold text-slate-900">Health</h1>
-      <pre className="mt-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">{JSON.stringify(data, null, 2)}</pre>
+    <main className="p-8 bg-slate-950 min-h-screen">
+      <h1 className="text-2xl font-bold text-white mb-4">Health</h1>
+      <pre className="mt-4 bg-slate-900 p-4 rounded-lg border border-slate-800 shadow-sm text-slate-100">{JSON.stringify(data, null, 2)}</pre>
     </main>
   );
 }
