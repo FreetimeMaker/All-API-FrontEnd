@@ -18,9 +18,10 @@ function ProviderIcon({ provider }: { provider: "github" | "gitlab" }) {
 
 export default function LoginPage() {
   function redirectTo(provider: "github" | "gitlab") {
-    // Redirect to our own callback handler which will manage cookies and redirect to dashboard
+    // Redirect directly to the API to avoid proxy cookie issues
     const baseUrl = window.location.origin;
-    window.location.href = `/api/proxy/api/v1/auth/login?provider=${provider}&next=${encodeURIComponent(baseUrl + '/auth/callback')}`;
+    const apiUrl = "https://all-api-node.vercel.app";
+    window.location.href = `${apiUrl}/api/v1/auth/login?provider=${provider}&next=${encodeURIComponent(baseUrl + '/auth/callback')}`;
   }
 
   return (

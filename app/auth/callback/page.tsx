@@ -19,16 +19,18 @@ export default function AuthCallbackPage() {
     // Log callback parameters for debugging
     console.log("Auth callback received params:", Object.fromEntries(urlParams.entries()));
 
-    // After OAuth callback from API, redirect to dashboard
-    // The cookies should already be set by the API
-    router.push("/dashboard");
+    // Wait a moment for cookies to be set, then redirect to dashboard
+    setTimeout(() => {
+      router.push("/dashboard");
+    }, 1000);
   }, [router]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="flex items-center justify-center min-h-screen bg-slate-950">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-        <p className="text-slate-700">Wird eingeloggt...</p>
+        <p className="text-slate-300">Wird eingeloggt...</p>
+        <p className="text-slate-500 text-sm mt-2">Session wird überprüft...</p>
       </div>
     </div>
   );
