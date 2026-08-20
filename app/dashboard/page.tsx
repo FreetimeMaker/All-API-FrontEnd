@@ -1,14 +1,42 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     fetch("/api/session")
       .then(res => res.json())
-      .then(data => setUser(data.user));
-  }, []);
+      .then(data => {
+        if (!data.loggedIn) {
+          router.push("/login");
+        } else {
+          setUser(data.user);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [router]);
+
+  async function handleLogout() {
+    try {
+      await fetch("/api/proxy/api/v1/auth/logout", { method: "POST" });
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      router.push("/login");
+    }
+  }
+
+  if (loading) {
+    return <div className="p-8">Loading...</div>;
+  }
+
+  if (!user) {
+    return null; // Will redirect
+  }
 
   const accountStats = [
     { title: "Konto-Status", value: "Aktiv", change: "Verifiziert", icon: "🛡️" },
@@ -101,7 +129,7 @@ export default function DashboardPage() {
               📧 E-Mail Einstellungen
             </button>
             <div className="mt-2 pt-2 border-t">
-              <button className="w-full text-left px-4 py-2 text-sm font-medium hover:bg-red-50 text-red-600 rounded-lg flex items-center gap-2 transition-colors">
+              <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm font-medium hover:bg-red-50 text-red-600 rounded-lg flex items-center gap-2 transition-colors">
                 🚪 Abmelden
               </button>
             </div>

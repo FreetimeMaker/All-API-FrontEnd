@@ -18,8 +18,7 @@ function ProviderIcon({ provider }: { provider: "github" | "gitlab" }) {
 
 export default function LoginPage() {
   function redirectTo(provider: "github" | "gitlab") {
-    // Let the API handle the OAuth flow - it will redirect back to its own callback
-    // and set session cookies. We just need to redirect to dashboard after login.
+    // The API needs the next parameter to know where to redirect after successful login
     const baseUrl = window.location.origin;
     window.location.href = `/api/proxy/api/v1/auth/login?provider=${provider}&next=${encodeURIComponent(baseUrl + '/dashboard')}`;
   }

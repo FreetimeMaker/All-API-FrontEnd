@@ -1,7 +1,7 @@
 import React from "react";
 
 export default async function HealthPage() {
-  const res = await fetch(`/api/proxy/api/v1/health`, { cache: "no-store" });
+  const res = await fetch(`/api/health`, { cache: "no-store" });
   const data = await res.json().catch(() => ({}));
 
   return (
