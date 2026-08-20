@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_BASE = process.env.API_BASE || "https://all-api-node.vercel.app";
+const API_BASE = process.env.API_BASE || "https://all-api.vercel.app";
 
 // Headers that should not be forwarded to/from the upstream API
 const HOP_BY_HOP_HEADERS = [

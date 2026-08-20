@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-const API_BASE = process.env.API_BASE || "https://all-api-node.vercel.app";
+const API_BASE = process.env.API_BASE || "https://all-api.vercel.app";
 
 function looksLikeUser(obj: any) {
   if (!obj || typeof obj !== "object") return false;
@@ -11,12 +11,16 @@ function looksLikeUser(obj: any) {
 
 export async function GET(req: NextRequest) {
   const cookie = req.headers.get("cookie") || "";
+  console.log("Session check - cookies present:", !!cookie);
+  
   try {
     const res = await fetch(`${API_BASE}/api/v1/auth/me`, {
       method: "GET",
       headers: { cookie },
       credentials: "include",
     });
+    
+    console.log("Session check - API response status:", res.status);
 
     if (!res.ok) {
       return new Response(JSON.stringify({ loggedIn: false }), {
