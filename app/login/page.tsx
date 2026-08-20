@@ -19,7 +19,7 @@ function ProviderIcon({ provider }: { provider: "github" | "gitlab" }) {
 export default function LoginPage() {
   function redirectTo(provider: "github" | "gitlab") {
     // use proxy so health-check runs before forwarding; upstream expects /api/v1/auth/login?provider={provider}
-    window.location.href = `/api/proxy/api/v1/auth/login?provider=${provider}`;
+    window.location.href = `/api/proxy/api/v1/auth/login?provider=${provider}&next=all-api-front-end-delta.vercel.app`;
   }
 
   return (
