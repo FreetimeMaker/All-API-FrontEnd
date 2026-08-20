@@ -18,31 +18,29 @@ function ProviderIcon({ provider }: { provider: "github" | "gitlab" }) {
 
 export default function LoginPage() {
   function redirectTo(provider: "github" | "gitlab") {
-    // Redirect directly to the API to avoid proxy cookie issues
-    const baseUrl = window.location.origin;
-    const apiUrl = "https://all-api-node.vercel.app";
-    window.location.href = `${apiUrl}/api/v1/auth/login?provider=${provider}&next=${encodeURIComponent(baseUrl + '/auth/callback')}`;
+    // Use our own API route that handles the redirect properly
+    window.location.href = `/api/auth/login?provider=${provider}&next=/dashboard`;
   }
 
   return (
-    <main className="flex items-center justify-center min-h-[60vh] p-6 bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-slate-200">
-        <h1 className="text-2xl font-semibold text-slate-800">Anmelden</h1>
-        <p className="mt-2 text-sm text-slate-600">Bitte mit GitHub oder GitLab anmelden. Weiterleitungen laufen über den Server.</p>
+    <main className="flex items-center justify-center min-h-screen p-6 bg-slate-950">
+      <div className="w-full max-w-md bg-slate-900 rounded-xl shadow-lg p-8 border border-slate-800">
+        <h1 className="text-2xl font-semibold text-white">Anmelden</h1>
+        <p className="mt-2 text-sm text-slate-400">Bitte mit GitHub oder GitLab anmelden. Weiterleitungen laufen über den Server.</p>
 
         <div className="mt-6 flex flex-col gap-3">
-          <button onClick={() => redirectTo("github")} className="flex items-center gap-3 px-4 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 hover:border-slate-400 transition-all duration-200">
+          <button onClick={() => redirectTo("github")} className="flex items-center gap-3 px-4 py-3 border border-slate-700 rounded-lg hover:bg-slate-800 hover:border-slate-600 transition-all duration-200">
             <ProviderIcon provider="github" />
-            <span className="font-medium text-slate-700">Mit GitHub anmelden</span>
+            <span className="font-medium text-slate-200">Mit GitHub anmelden</span>
           </button>
 
-          <button onClick={() => redirectTo("gitlab")} className="flex items-center gap-3 px-4 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 hover:border-slate-400 transition-all duration-200">
+          <button onClick={() => redirectTo("gitlab")} className="flex items-center gap-3 px-4 py-3 border border-slate-700 rounded-lg hover:bg-slate-800 hover:border-slate-600 transition-all duration-200">
             <ProviderIcon provider="gitlab" />
-            <span className="font-medium text-slate-700">Mit GitLab anmelden</span>
+            <span className="font-medium text-slate-200">Mit GitLab anmelden</span>
           </button>
         </div>
 
-        <p className="mt-4 text-sm text-slate-600">Hinweis: Vor jedem API-Aufruf prüft der Server die Health-API; wenn die API nicht verfügbar ist, wird die Anfrage abgelehnt.</p>
+        <p className="mt-4 text-sm text-slate-500">Hinweis: Vor jedem API-Aufruf prüft der Server die Health-API; wenn die API nicht verfügbar ist, wird die Anfrage abgelehnt.</p>
       </div>
     </main>
   );

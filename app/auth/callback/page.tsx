@@ -1,14 +1,15 @@
 "use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     // Check for error parameters from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const error = urlParams.get("error");
+    const error = searchParams.get("error");
+    const next = searchParams.get("next") || "/dashboard";
     
     if (error) {
       console.error("OAuth error:", error);
@@ -17,13 +18,13 @@ export default function AuthCallbackPage() {
     }
 
     // Log callback parameters for debugging
-    console.log("Auth callback received params:", Object.fromEntries(urlParams.entries()));
+    console.log("Auth callback received params:", Object.fromEntries(searchParams.entries()));
 
-    // Wait a moment for cookies to be set, then redirect to dashboard
+    // Wait a moment for cookies to be set, then redirect to the next page
     setTimeout(() => {
-      router.push("/dashboard");
+      router.push(next);
     }, 1000);
-  }, [router]);
+  }, [router, searchParams]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-slate-950">
@@ -33,5 +34,13 @@ export default function AuthCallbackPage() {
         <p className="text-slate-500 text-sm mt-2">Session wird überprüft...</p>
       </div>
     </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-slate-950"><p className="text-slate-300">Loading...</p></div>}>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }
