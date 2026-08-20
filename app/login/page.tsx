@@ -18,10 +18,10 @@ function ProviderIcon({ provider }: { provider: "github" | "gitlab" }) {
 
 export default function LoginPage() {
   function redirectTo(provider: "github" | "gitlab") {
-    // use proxy so health-check runs before forwarding; upstream expects /api/v1/auth/login?provider={provider}
-    // Add callback_url to redirect to our new callback handler
+    // Let the API handle the OAuth flow - it will redirect back to its own callback
+    // and set session cookies. We just need to redirect to dashboard after login.
     const baseUrl = window.location.origin;
-    window.location.href = `/api/proxy/api/v1/auth/login?provider=${provider}&callback_url=${encodeURIComponent(baseUrl + '/api/auth/callback')}&next=all-api-front-end-delta.vercel.app`;
+    window.location.href = `/api/proxy/api/v1/auth/login?provider=${provider}&next=${encodeURIComponent(baseUrl + '/dashboard')}`;
   }
 
   return (
