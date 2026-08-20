@@ -11,12 +11,16 @@ function looksLikeUser(obj: any) {
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization") || "";
+  const accessToken = req.headers.get("x-access-token") || ""; // Client can send token via custom header
   console.log("Session check - auth header present:", !!authHeader);
+  console.log("Session check - access token present:", !!accessToken);
   
   try {
     const headers: HeadersInit = {};
     if (authHeader) {
       headers["authorization"] = authHeader;
+    } else if (accessToken) {
+      headers["authorization"] = `Bearer ${accessToken}`;
     }
     
     const res = await fetch(`${API_BASE}/api/v1/auth/me`, {

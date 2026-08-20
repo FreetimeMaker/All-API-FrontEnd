@@ -34,12 +34,13 @@ export default function AuthNav() {
 
       const accessToken = localStorage.getItem('access_token');
       const authCode = localStorage.getItem('auth_code');
+      const userToken = localStorage.getItem('auth_token'); // New key from callback
       const headers: HeadersInit = {};
+      const tokenToUse = accessToken || authCode || userToken;
       
-      if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
-      } else if (authCode) {
-        headers['Authorization'] = `Bearer ${authCode}`;
+      if (tokenToUse) {
+        headers['Authorization'] = `Bearer ${tokenToUse}`;
+        headers['x-access-token'] = tokenToUse; // Send via custom header as well
       }
       
       const res = await fetch("/api/session", {
@@ -69,11 +70,15 @@ export default function AuthNav() {
 
   async function handleLogout() {
     try {
-      // Clear mock session
+      // Clear all auth-related items from localStorage
       localStorage.removeItem('mock_session');
       localStorage.removeItem('mock_user');
       localStorage.removeItem('access_token');
       localStorage.removeItem('auth_code');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('token_type');
+      localStorage.removeItem('token_expires_at');
+      localStorage.removeItem('user_info');
       
       // Try to logout from API
       const res = await fetch("/api/proxy/api/v1/auth/logout", { method: "POST" });
@@ -85,6 +90,10 @@ export default function AuthNav() {
       localStorage.removeItem('mock_user');
       localStorage.removeItem('access_token');
       localStorage.removeItem('auth_code');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('token_type');
+      localStorage.removeItem('token_expires_at');
+      localStorage.removeItem('user_info');
       await fetchSession();
     }
   }

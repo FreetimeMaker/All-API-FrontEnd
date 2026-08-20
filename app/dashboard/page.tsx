@@ -24,14 +24,15 @@ export default function DashboardPage() {
 
     const accessToken = localStorage.getItem('access_token');
     const authCode = localStorage.getItem('auth_code');
-    console.log("Dashboard: Access token present:", !!accessToken, "Auth code present:", !!authCode);
+    const userToken = localStorage.getItem('auth_token'); // New key from callback
+    console.log("Dashboard: Access token present:", !!accessToken, "Auth code present:", !!authCode, "Auth token present:", !!userToken);
     
     const headers: HeadersInit = {};
+    const tokenToUse = accessToken || authCode || userToken;
     
-    if (accessToken) {
-      headers['Authorization'] = `Bearer ${accessToken}`;
-    } else if (authCode) {
-      headers['Authorization'] = `Bearer ${authCode}`;
+    if (tokenToUse) {
+      headers['Authorization'] = `Bearer ${tokenToUse}`;
+      headers['x-access-token'] = tokenToUse; // Send via custom header as well
     }
     
     fetch("/api/session", {
@@ -78,11 +79,15 @@ export default function DashboardPage() {
 
   async function handleLogout() {
     try {
-      // Clear mock session
+      // Clear all auth-related items from localStorage
       localStorage.removeItem('mock_session');
       localStorage.removeItem('mock_user');
       localStorage.removeItem('access_token');
       localStorage.removeItem('auth_code');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('token_type');
+      localStorage.removeItem('token_expires_at');
+      localStorage.removeItem('user_info');
       
       await fetch("/api/proxy/api/v1/auth/logout", { method: "POST" });
       router.push("/login");
@@ -93,6 +98,10 @@ export default function DashboardPage() {
       localStorage.removeItem('mock_user');
       localStorage.removeItem('access_token');
       localStorage.removeItem('auth_code');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('token_type');
+      localStorage.removeItem('token_expires_at');
+      localStorage.removeItem('user_info');
       router.push("/login");
     }
   }
