@@ -96,7 +96,7 @@ export default function DashboardPage() {
             </a>
             <button className="w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 rounded-lg border flex items-center gap-2">
               🔒 Passwort ändern
-            </a>
+            </button>
             <button className="w-full text-left px-4 py-2 text-sm font-medium hover:bg-gray-50 rounded-lg border flex items-center gap-2">
               📧 E-Mail Einstellungen
             </button>

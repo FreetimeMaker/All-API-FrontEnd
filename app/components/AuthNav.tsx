@@ -77,39 +77,40 @@ export default function AuthNav() {
           <div className="flex items-center gap-4">
             <a href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">Dashboard</a>
             <div className="flex items-center gap-3">
-            {(() => {
-              const avatarUrl =
-                user?.avatar ||
-                user?.avatar_url ||
-                user?.picture ||
-                user?.image ||
-                user?.avatarUrl ||
-                user?.profile_image_url ||
-                null;
+              {(() => {
+                const avatarUrl =
+                  user?.avatar ||
+                  user?.avatar_url ||
+                  user?.picture ||
+                  user?.image ||
+                  user?.avatarUrl ||
+                  user?.profile_image_url ||
+                  null;
 
-              const name = user?.name || user?.username || "User";
+                const name = user?.name || user?.username || "User";
 
-              if (avatarUrl) {
-                // eslint-disable-next-line @next/next/no-img-element
-                return <img src={avatarUrl} alt={`${name} profile`} className="h-8 w-8 rounded-full object-cover" onError={(e)=>{(e.target as HTMLImageElement).style.display='none'}} />;
-              }
+                if (avatarUrl) {
+                  // eslint-disable-next-line @next/next/no-img-element
+                  return <img src={avatarUrl} alt={`${name} profile`} className="h-8 w-8 rounded-full object-cover" onError={(e)=>{(e.target as HTMLImageElement).style.display='none'}} />;
+                }
 
-              const initials = name
-                .split(" ")
-                .map((s: string) => s[0])
-                .slice(0, 2)
-                .join("")
-                .toUpperCase();
+                const initials = name
+                  .split(" ")
+                  .map((s: string) => s[0])
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase();
 
-              return (
-                <div aria-hidden className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-700">
-                  {initials}
-                </div>
-              );
-            })()}
+                return (
+                  <div aria-hidden className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-700">
+                    {initials}
+                  </div>
+                );
+              })()}
 
-            <span className="text-sm">{user?.name ?? user?.username ?? "User"}</span>
-            <button onClick={handleLogout} className="px-3 py-1 rounded bg-red-600 text-white text-sm">Logout</button>
+              <span className="text-sm">{user?.name ?? user?.username ?? "User"}</span>
+              <button onClick={handleLogout} className="px-3 py-1 rounded bg-red-600 text-white text-sm">Logout</button>
+            </div>
           </div>
         ) : (
           <a href="/login" className="px-3 py-1 rounded bg-blue-600 text-white text-sm">Login</a>
