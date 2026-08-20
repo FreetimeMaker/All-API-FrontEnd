@@ -33,7 +33,7 @@ export default function Home() {
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-center py-20 px-6 sm:items-start">
         <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-4">
-          v0.1.0 Beta
+          v1.0.0
         </div>
         <h1 className="text-5xl font-extrabold mb-6 tracking-tight text-gray-900 dark:text-white">
           All API <span className="text-blue-600">Frontend</span>
