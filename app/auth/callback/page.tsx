@@ -57,35 +57,26 @@ function AuthCallbackContent() {
       // Otherwise fetch user info using the access token
       fetchUserInfo(accessToken, router);
     } else {
-      // Fallback to mock session if no token is provided
-      console.log("No access token received, using mock session");
-      localStorage.setItem('mock_session', 'true');
-      localStorage.setItem('mock_user', JSON.stringify({
-        name: "Test User",
-        username: "testuser",
-        email: "test@example.com"
-      }));
-
-      // Verify the values were set
-      console.log("Mock session set:", localStorage.getItem('mock_session'));
-      console.log("Mock user set:", localStorage.getItem('mock_user'));
-
-      // Redirect to dashboard after a short delay
-      setTimeout(() => {
-        console.log("Redirecting to dashboard");
-        router.push("/dashboard");
-      }, 1000);
+      // No token received - redirect back to login with error
+      console.log("No access token received in callback");
+      router.push("/login?error=" + encodeURIComponent("Authentifizierung fehlgeschlagen: Kein Token empfangen."));
     }
   }, [router, searchParams]);
 
   async function fetchUserInfo(accessToken: string, router: any) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
     try {
       const API_BASE = process.env.API_BASE || "https://all-api-node.vercel.app";
       const response = await fetch(`${API_BASE}/api/v1/auth/me`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`
-        }
+        },
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       if (response.ok) {
         const userData = await response.json();
@@ -93,26 +84,19 @@ function AuthCallbackContent() {
         
         // Store user info in localStorage
         localStorage.setItem('user_info', JSON.stringify(userData));
-        localStorage.setItem('auth_token', accessToken); // Alternative key for consistency
+        localStorage.setItem('auth_token', accessToken);
         
         // Redirect to dashboard
-        setTimeout(() => {
-          console.log("Redirecting to dashboard with token");
-          router.push("/dashboard");
-        }, 500);
+        router.push("/dashboard");
       } else {
         console.error("Failed to fetch user info:", response.status);
-        // Still redirect to dashboard, the session check will handle auth failure
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 1000);
+        router.push("/login?error=" + encodeURIComponent("Benutzerinformationen konnten nicht geladen werden."));
       }
-    } catch (error) {
+    } catch (error: any) {
+      clearTimeout(timeoutId);
       console.error("Error fetching user info:", error);
-      // Still redirect to dashboard
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1000);
+      const message = error.name === 'AbortError' ? "Zeitüberschreitung beim Laden der Benutzerdaten." : "Fehler beim Laden der Benutzerdaten.";
+      router.push("/login?error=" + encodeURIComponent(message));
     }
   }
 

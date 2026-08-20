@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const API_BASE = process.env.API_BASE || "https://all-api-node.vercel.app";
+const PROXY_TIMEOUT = 15000; // 15 seconds
+
+async function checkApiHealth() {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), 2000); // 2s health check
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/health`, {
+      signal: controller.signal,
+      cache: 'no-store'
+    });
+    clearTimeout(id);
+    return res.ok;
+  } catch (e) {
+    clearTimeout(id);
+    return false;
+  }
+}
 
 // Headers that should not be forwarded to/from the upstream API
 const HOP_BY_HOP_HEADERS = [
@@ -18,6 +35,18 @@ const HOP_BY_HOP_HEADERS = [
 async function forward(req: NextRequest, pathArray: string[] | string) {
   try {
     const path = Array.isArray(pathArray) ? pathArray.join("/") : String(pathArray);
+
+    // Check health unless it's the health endpoint itself
+    if (!path.includes("health")) {
+      const isHealthy = await checkApiHealth();
+      if (!isHealthy) {
+        return NextResponse.json(
+          { error: "API not reachable", message: "The API is currently not responding." },
+          { status: 503 }
+        );
+      }
+    }
+
     const target = new URL(`${API_BASE}/${path}`);
 
     // Preserve incoming query parameters
@@ -31,9 +60,13 @@ async function forward(req: NextRequest, pathArray: string[] | string) {
       headers.set(key, value);
     });
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), PROXY_TIMEOUT);
+
     // Special handling for login routes (direct browser redirect to provider)
     if (req.method === "GET" && path.toLowerCase().includes("/auth/login")) {
       console.log("Proxying login redirect to:", target.toString());
+      clearTimeout(timeoutId);
       return NextResponse.redirect(target.toString(), 307);
     }
 
@@ -45,8 +78,11 @@ async function forward(req: NextRequest, pathArray: string[] | string) {
       const res = await fetch(target.toString(), {
         method: req.method,
         headers,
-        redirect: "follow", // Follow redirects to get the final response
+        redirect: "follow",
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       // Try to extract tokens from the response
       const contentType = res.headers.get("content-type") || "";
@@ -135,8 +171,11 @@ async function forward(req: NextRequest, pathArray: string[] | string) {
       method: req.method,
       headers,
       body,
-      redirect: "manual", // Let the browser handle redirects (301/302)
+      redirect: "manual",
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     const responseHeaders = new Headers();
     res.headers.forEach((value, key) => {

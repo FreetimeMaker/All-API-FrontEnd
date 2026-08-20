@@ -20,16 +20,21 @@ export async function GET(req: NextRequest) {
   
   if (code && provider) {
     // Exchange the authorization code for tokens
-    console.log("Exchanging authorization code for tokens");
+    console.log(`Exchanging authorization code for tokens (Provider: ${provider})`);
     
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
     try {
       const tokenResponse = await fetch(`${API_BASE}/api/v1/auth/callback?code=${encodeURIComponent(code)}&provider=${provider}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
       console.log("Token exchange response status:", tokenResponse.status);
       
       if (tokenResponse.ok) {
@@ -39,7 +44,7 @@ export async function GET(req: NextRequest) {
         if (contentType.includes("application/json")) {
           try {
             const jsonData = await tokenResponse.json();
-            console.log("Token response JSON:", jsonData);
+            console.log("Token response JSON received");
             
             // Extract tokens from response
             if (jsonData.access_token) tokens.access_token = jsonData.access_token;
@@ -67,13 +72,20 @@ export async function GET(req: NextRequest) {
           });
           return NextResponse.redirect(frontendCallback.toString(), 302);
         }
+      } else {
+        const errorText = await tokenResponse.text().catch(() => "Unknown error");
+        console.error("Token exchange failed:", errorText);
+        return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent("Token-Austausch fehlgeschlagen.")}`, req.url));
       }
-    } catch (e) {
+    } catch (e: any) {
+      clearTimeout(timeoutId);
       console.error("Error exchanging code for tokens:", e);
+      const message = e.name === 'AbortError' ? "Zeitüberschreitung beim Token-Austausch." : "Fehler beim Token-Austausch.";
+      return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(message)}`, req.url));
     }
   }
   
-  // Fallback: redirect to frontend callback without tokens (will use mock session)
-  console.log("No tokens found, redirecting to frontend callback for mock session");
-  return NextResponse.redirect(new URL("/auth/callback", req.url), 302);
+  // Fallback: redirect to login with error if no tokens could be exchanged
+  console.log("Insufficient parameters for token exchange, redirecting to login");
+  return NextResponse.redirect(new URL("/login?error=" + encodeURIComponent("Ungültige Callback-Parameter."), req.url), 302);
 }
