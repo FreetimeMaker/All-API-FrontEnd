@@ -33,6 +33,7 @@ async function forward(req: NextRequest, pathArray: string[] | string) {
 
     // Special handling for login routes (direct browser redirect to provider)
     if (req.method === "GET" && path.toLowerCase().includes("/auth/login")) {
+      console.log("Proxying login redirect to:", target.toString());
       return NextResponse.redirect(target.toString(), 307);
     }
 
