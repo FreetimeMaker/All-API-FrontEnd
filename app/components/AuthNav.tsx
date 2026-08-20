@@ -7,6 +7,16 @@ export default function AuthNav() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [healthStatus, setHealthStatus] = useState<"ok" | "error" | "loading">("loading");
+
+  async function checkHealth() {
+    try {
+      const res = await fetch("/api/health");
+      setHealthStatus(res.ok ? "ok" : "error");
+    } catch {
+      setHealthStatus("error");
+    }
+  }
 
   async function fetchSession() {
     setLoading(true);
@@ -28,6 +38,7 @@ export default function AuthNav() {
 
   useEffect(() => {
     let mounted = true;
+    checkHealth();
     fetchSession();
     return () => {
       mounted = false;
@@ -46,7 +57,13 @@ export default function AuthNav() {
 
   return (
     <nav className="max-w-4xl mx-auto flex items-center justify-between py-2">
-      <a href="/" className="font-semibold text-lg">All API Frontend</a>
+      <div className="flex items-center gap-4">
+        <a href="/" className="font-semibold text-lg">All API Frontend</a>
+        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gray-50 border text-[10px] font-medium uppercase tracking-wider text-gray-500">
+          <div className={`h-2 w-2 rounded-full ${healthStatus === 'ok' ? 'bg-green-500' : healthStatus === 'error' ? 'bg-red-500' : 'bg-yellow-400 animate-pulse'}`} />
+          API {healthStatus === 'ok' ? 'Online' : healthStatus === 'error' ? 'Offline' : 'Checking'}
+        </div>
+      </div>
 
       <div className="flex items-center gap-4">
         {loading ? (

@@ -1,22 +1,6 @@
 import { NextRequest } from "next/server";
 
 const API_BASE = process.env.API_BASE || "https://all-api-node.vercel.app";
-const HEALTH_PATH = "/api/v1/health";
-const HEALTH_TIMEOUT = 3000;
-
-async function checkHealth() {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), HEALTH_TIMEOUT);
-  try {
-    const res = await fetch(`${API_BASE}${HEALTH_PATH}`, { signal: controller.signal });
-    const json = await res.json().catch(() => null);
-    clearTimeout(id);
-    return { ok: res.ok, status: res.status, body: json };
-  } catch (e) {
-    clearTimeout(id);
-    return { ok: false, error: String(e) };
-  }
-}
 
 function looksLikeUser(obj: any) {
   if (!obj || typeof obj !== "object") return false;
@@ -26,14 +10,6 @@ function looksLikeUser(obj: any) {
 }
 
 export async function GET(req: NextRequest) {
-  const health = await checkHealth();
-  if (!health.ok) {
-    return new Response(JSON.stringify({ loggedIn: false, health }), {
-      status: 503,
-      headers: { "content-type": "application/json" },
-    });
-  }
-
   const cookie = req.headers.get("cookie") || "";
   try {
     const res = await fetch(`${API_BASE}/api/v1/auth/me`, {

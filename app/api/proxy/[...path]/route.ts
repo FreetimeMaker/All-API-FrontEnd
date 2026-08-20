@@ -1,31 +1,8 @@
 import { NextRequest } from "next/server";
 
 const API_BASE = process.env.API_BASE || "https://all-api-node.vercel.app";
-const HEALTH_PATH = "/api/v1/health";
-const HEALTH_TIMEOUT = 3000;
-
-async function checkHealth() {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), HEALTH_TIMEOUT);
-  try {
-    const res = await fetch(`${API_BASE}${HEALTH_PATH}`, { signal: controller.signal });
-    const json = await res.json().catch(() => null);
-    clearTimeout(id);
-    return { ok: res.ok, status: res.status, body: json };
-  } catch (e) {
-    clearTimeout(id);
-    return { ok: false, error: String(e) };
-  }
-}
 
 async function forward(req: NextRequest, pathArray: string[] | string) {
-  // run health check first
-  const health = await checkHealth();
-  if (!health.ok) {
-    const body = JSON.stringify({ error: "upstream health check failed", details: health });
-    return new Response(body, { status: 503, headers: { "content-type": "application/json" } });
-  }
-
   const path = Array.isArray(pathArray) ? pathArray.join("/") : String(pathArray);
   // Build target URL and preserve incoming query string
   const target = new URL(`${API_BASE}/${path}`);
