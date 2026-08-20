@@ -30,45 +30,45 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-center py-20 px-6 sm:items-start">
-        <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-4">
+    <div className="flex flex-col flex-1 items-center justify-center bg-slate-950 font-sans min-h-screen">
+      <main className="flex flex-1 w-full max-w-4xl flex-col items-center justify-center py-20 px-6">
+        <div className="bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-4">
           v1.0.0
         </div>
-        <h1 className="text-5xl font-extrabold mb-6 tracking-tight text-gray-900 dark:text-white">
-          All API <span className="text-blue-600">Frontend</span>
+        <h1 className="text-5xl font-extrabold mb-6 tracking-tight text-white">
+          All API <span className="text-indigo-400">Frontend</span>
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 mb-10 max-w-lg leading-relaxed">
+        <p className="text-lg text-slate-300 mb-10 max-w-lg leading-relaxed text-center">
           Verwalte dein Benutzerkonto, überprüfe deine Sicherheitsstatistiken und behalte den Überblick über deine Profilaktivitäten – alles an einem zentralen Ort.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <Link
             href="/login"
-            className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all text-center"
+            className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 transition-all text-center"
           >
             Jetzt loslegen
           </Link>
           <Link
             href="/health"
-            className="px-8 py-3 bg-white text-gray-700 border rounded-xl font-bold hover:bg-gray-50 transition-all text-center"
+            className="px-8 py-3 bg-slate-800 text-slate-100 border border-slate-700 rounded-xl font-bold hover:bg-slate-700 transition-all text-center"
           >
             System Status
           </Link>
         </div>
 
-        <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 w-full border-t pt-10">
-          <div>
-            <h3 className="font-bold text-gray-900 mb-2">OAuth Login</h3>
-            <p className="text-sm text-gray-500">Sichere Anmeldung über GitHub oder GitLab.</p>
+        <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 w-full border-t border-slate-800 pt-10">
+          <div className="text-center sm:text-left">
+            <h3 className="font-bold text-white mb-2 text-lg">OAuth Login</h3>
+            <p className="text-sm text-slate-400">Sichere Anmeldung über GitHub oder GitLab.</p>
           </div>
-          <div>
-            <h3 className="font-bold text-gray-900 mb-2">Proxy API</h3>
-            <p className="text-sm text-gray-500">Nahtlose Integration deiner Backend-Dienste.</p>
+          <div className="text-center sm:text-left">
+            <h3 className="font-bold text-white mb-2 text-lg">Proxy API</h3>
+            <p className="text-sm text-slate-400">Nahtlose Integration deiner Backend-Dienste.</p>
           </div>
-          <div>
-            <h3 className="font-bold text-gray-900 mb-2">Live Monitor</h3>
-            <p className="text-sm text-gray-500">Echtzeit-Health-Checks für alle Endpunkte.</p>
+          <div className="text-center sm:text-left">
+            <h3 className="font-bold text-white mb-2 text-lg">Live Monitor</h3>
+            <p className="text-sm text-slate-400">Echtzeit-Health-Checks für alle Endpunkte.</p>
           </div>
         </div>
       </main>
